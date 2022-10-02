@@ -875,3 +875,6 @@ painlessly	1
 erroneously	-1
 sneakily	-1
 epically	4
+best	5
+sorry	-3
+flat-footed	-2

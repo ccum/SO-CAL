@@ -1,0 +1,1 @@
+El/NNP peru/NNP es/NNP bello/NNP

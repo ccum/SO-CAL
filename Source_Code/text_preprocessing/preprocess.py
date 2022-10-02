@@ -1,9 +1,11 @@
 import os
 import argparse
+from time import process_time_ns
 from pycorenlp import StanfordCoreNLP
 import unidecode
-
-
+from ServiceUtils import ServiceUtils
+import json
+from pandas.io.json import json_normalize
 class Preprocess():
     def __init__(self, args):
         '''
@@ -30,6 +32,8 @@ class Preprocess():
         print("Your Output Folder: " + self.output_folder)
         print("Your Stanford annotators: " + self.standford_annotators)
 
+        print("fin Preprocess init")
+
 
     def str_process(self, row_string):
         '''
@@ -38,10 +42,12 @@ class Preprocess():
         :param row_string: The string format input for Standford CoreNLP
         :return: Json format output
         '''
+        print("inicio str_process")
         processed_json = self.nlp.annotate(row_string, properties={
                        'annotators': self.standford_annotators,
                        'outputFormat': 'json'
                    })
+        print("fin str_process")
         return processed_json
 
 
@@ -52,8 +58,13 @@ class Preprocess():
         :param file_name: output file name
         :return: None
         '''
+        
+        print("incio output_preprocessed_data")
         rows = []
-        for sent in json_input['sentences']:
+        json_input_2 = ServiceUtils().openJSONFile('salida1')
+        #print(json_input_2)
+        for sent in json_input_2['sentences']:
+            print(sent)
             parsed_sent = " ".join([t['originalText'] + "/" + t['pos'] for t in sent['tokens']])
             rows.append(parsed_sent)
         output_file_path = self.output_folder + '/' + file_name
@@ -63,6 +74,7 @@ class Preprocess():
             for r in rows:
                 preprocessed_out.write(unidecode.unidecode(r) + "\n")
 
+        print("fin output_preprocessed_data")
 
     def pos_tagging(self):
         '''
@@ -70,16 +82,23 @@ class Preprocess():
         Output the results into files witH POS Tags.
         :return: None
         '''
+        print("Inicio pos_tagging")
         if self.input_type == "file":
+            print("pos_tagging type file")
             file_name = os.path.basename(self.input)
             text_string = ""
             with open(self.input, 'rb') as file_input:
                 for r in file_input:
                     text_string = " ".join([text_string, r.strip().decode('utf-8', 'backslashreplace')])
+                    #print(text_string)
             print(self.input + " Done!")
+            print(text_string)
             parsed_json = self.str_process(text_string)
+            print(parsed_json)
+            ServiceUtils().writeFileJSON(json.loads(parsed_json),"salida1")
             self.output_preprocessed_data(parsed_json, file_name)
         elif self.input_type == "dir":
+            print("pos_tagging type dir")
             for file_name in os.listdir(self.input):
                 input_file_path = self.input + "/" + file_name
                 text_string = ""
@@ -89,11 +108,12 @@ class Preprocess():
                 parsed_json = self.str_process(text_string)
                 print(input_file_path + " Done!")
                 self.output_preprocessed_data(parsed_json, file_name)
-
+        print("fin pos_tagging")
 
 
 def main():
     # Define command line parameters
+    print("UNO")
     parser = argparse.ArgumentParser(description='Get terminal command line input')
     parser.add_argument('--input', '-i', type=str, dest='input_path', action='store',
                             default='../input/Raw_Text/BOOKS/',
@@ -114,7 +134,7 @@ def main():
                                  find annotators here: http://stanfordnlp.github.io/CoreNLP/annotators.html
                                  """)
     args = parser.parse_args()
-
+    print("DOS")
     p = Preprocess(args)
     p.pos_tagging()
 

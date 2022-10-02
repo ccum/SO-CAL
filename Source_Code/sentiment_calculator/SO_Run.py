@@ -175,6 +175,7 @@ def generate_richoutJSON(richout_input, richout_output):
 
 
 def main():
+    print("main")
     pos_mark = "positive"
     neg_mark = "negative"
 
@@ -188,6 +189,8 @@ def main():
     gold_file = args.gold
     if gold_file == "":
         gold_file = create_gold_file(input_path)
+    
+
 
     basicout_path = os.path.abspath(output_folder) + "/output.txt"
     richout_path = os.path.abspath(output_folder) + "/richout.txt"
@@ -195,6 +198,7 @@ def main():
     prediction_accuracy_path =  os.path.abspath(output_folder) + "/prediction_accuracy.txt"
     richout_json = os.path.abspath(output_folder) + "/rich_output.json"
 
+    print("abriendo archivos")
     open(basicout_path, "w").close()
     open(richout_path, "w").close()
     open(file_sentiment_path, 'w').close()
@@ -202,14 +206,14 @@ def main():
 
     if os.path.isfile(input_path):  # 1 single file
         print("Processing " + os.path.basename(input_path) + "...")
-        cmd = "python3.5 sentiment_calculator/SO_Calc.py -i \"" + input_path + "\" -bo \"" + basicout_path + "\" -ro \"" + richout_path + "\" -c \"" + config_file + "\""
+        cmd = "python3 sentiment_calculator/SO_Calc.py -i \"" + input_path + "\" -bo \"" + basicout_path + "\" -ro \"" + richout_path + "\" -c \"" + config_file + "\""
         os.system(cmd)
     elif os.path.isdir(input_path):   # an input folder, only reads files
         for f_name in os.listdir(input_path):
             print("Processing " + f_name + "...")
             file_path = os.path.abspath(input_path) + "/" + f_name
             if os.path.isfile(file_path) == False: continue
-            cmd = "python3.5 sentiment_calculator/SO_Calc.py -i \"" + file_path + "\" -bo \"" + basicout_path + "\" -ro \"" + richout_path + "\" -c \"" + config_file + "\""
+            cmd = "python3 sentiment_calculator/SO_Calc.py -i \"" + file_path + "\" -bo \"" + basicout_path + "\" -ro \"" + richout_path + "\" -c \"" + config_file + "\""
             os.system(cmd)
 
     generate_file_sentiment(basicout_path, cutoff, file_sentiment_path)

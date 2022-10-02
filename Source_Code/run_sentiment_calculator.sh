@@ -2,5 +2,5 @@
 
 
 echo "Start Sentiment Calculator: "
-Python3.5 sentiment_calculator/SO_Run.py
+python3 sentiment_calculator/SO_Run.py
 echo "Done! Sentiment Calculation"
